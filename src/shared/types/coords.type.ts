@@ -1,4 +1,6 @@
+export type TCoordsTuple = [number, number];
+
 export type TCoords = {
-  lat: number;
-  lon: number;
+  latitude: number;
+  longitude: number;
 };

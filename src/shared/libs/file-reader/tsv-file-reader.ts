@@ -1,34 +1,24 @@
-import { readFileSync } from 'node:fs';
+import EventEmitter from 'node:events';
+import { createReadStream } from 'node:fs';
 
-import type { TOffer, TCoords } from '../../types/index.js';
+import type { TCoords, TOffer } from '../../types/index.js';
 import type { City, Comfort, Housing, UserType } from '../../enums/index.js';
 import type { IFileReader } from './file-reader.interface.js';
 
+const CHUNK_SIZE = 16384;
+
 const getCoordsFromStr = (str: string): TCoords => {
-  const [lat, lon] = str.split(';');
+  const [latit, longit] = str.split(';');
 
   return {
-    lat: Number(lat),
-    lon: Number(lon)
+    latitude: Number(latit),
+    longitude: Number(longit)
   };
 };
 
-export class TSVFileReader implements IFileReader {
-  private rawData = '';
-
-  constructor(private readonly filename: string) {}
-
-  private validateRawData(): void {
-    if (!this.rawData) {
-      throw new Error('File was not read');
-    }
-  }
-
-  private parseRawDataToOffers(): TOffer[] {
-    return this.rawData
-      .split('\n')
-      .filter((row) => row.trim().length > 0)
-      .map((line) => this.parseLineToOffer(line));
+export class TSVFileReader extends EventEmitter implements IFileReader {
+  constructor(private readonly filename: string) {
+    super();
   }
 
   private parseLineToOffer(line: string): TOffer {
@@ -73,7 +63,7 @@ export class TSVFileReader implements IFileReader {
       user: {
         name: userName,
         email: userEmail,
-        avatar: userAvatar === 'null' ? null : userAvatar,
+        avatar: userAvatar === 'null' ? undefined : userAvatar,
         password: userPassword,
         type: userType as UserType
       },
@@ -85,12 +75,29 @@ export class TSVFileReader implements IFileReader {
     return str.replace('\r', '');
   }
 
-  read(): void {
-    this.rawData = readFileSync(this.filename, { encoding: 'utf-8' });
-  }
+  async read() {
+    const readStream = createReadStream(this.filename, {
+      highWaterMark: CHUNK_SIZE,
+      encoding: 'utf-8'
+    });
 
-  toArray(): TOffer[] {
-    this.validateRawData();
-    return this.parseRawDataToOffers();
+    let remainingData = '';
+    let nextLinePosition = -1;
+    let importedRowCount = 0;
+
+    for await (const chunk of readStream) {
+      remainingData += chunk.toString();
+
+      while ((nextLinePosition = remainingData.indexOf('\n')) >= 0) {
+        const completeRow = remainingData.slice(0, nextLinePosition + 1);
+        remainingData = remainingData.slice(++nextLinePosition);
+        importedRowCount++;
+
+        const parsedOffer = this.parseLineToOffer(completeRow);
+        this.emit('line', parsedOffer);
+      }
+    }
+
+    this.emit('end', importedRowCount);
   }
 }
