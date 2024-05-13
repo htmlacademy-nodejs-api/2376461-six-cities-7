@@ -1,4 +1,6 @@
 import { generateRandomValue } from './generate-common.js';
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
 
 export function getRandomItems<T>(items: T[]): T[] {
   const startPosition = generateRandomValue(0, items.length - 1);
@@ -13,4 +15,9 @@ export function getRandomItem<T>(items: T[]): T {
 
 export function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : '';
+}
+
+export function getCurrentModuleDirectoryPath(){
+  const filepath = fileURLToPath(import.meta.url);
+  return dirname(filepath);
 }
