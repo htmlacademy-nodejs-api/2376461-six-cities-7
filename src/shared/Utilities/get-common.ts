@@ -21,3 +21,13 @@ export function getCurrentModuleDirectoryPath(){
   const filepath = fileURLToPath(import.meta.url);
   return dirname(filepath);
 }
+
+export function getMongoURI(
+  username: string,
+  password: string,
+  host: string,
+  port: string,
+  databaseName: string,
+){
+  return `mongodb://${username}:${password}@${host}:${port}/${databaseName}?authSource=admin`;
+}
