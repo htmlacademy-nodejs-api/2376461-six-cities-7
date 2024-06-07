@@ -36,6 +36,8 @@ export class GenerateCommand implements ICommand {
     const offerCount = Number(count);
 
     try {
+      console.log(url);
+      console.log(filepath);
       await this.load(url);
       await this.write(filepath, offerCount);
       console.info(`File ${filepath} was created!`);

@@ -54,14 +54,23 @@
       "Towels",
       "Fridge"
     ],
-    "names": [
+    "firstname": [
       "Denis",
       "Ostin",
-      "Baby goth",
-      "Super crafter",
-      "Pudge mettin",
-      "QWER TY",
-      "Andrey Truhin"
+      "Baby",
+      "Super",
+      "Pudge",
+      "QWER",
+      "Andrey"
+    ],
+    "lastname": [
+      "Last",
+      "Fast",
+      "Goth",
+      "Crafter",
+      "Heeelp",
+      "Qwack",
+      "Truhin"
     ],
     "emails": [
       "den@gmail.com",

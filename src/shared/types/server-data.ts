@@ -9,7 +9,8 @@ export type TServerData = {
   photos: string[];
   housings: Housing[];
   comforts: Comfort[];
-  names: string[];
+  firstname: string[];
+  lastname: string[];
   emails: string[];
   avatars: string[];
   passwords: string[];
