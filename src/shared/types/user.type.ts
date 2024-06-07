@@ -1,9 +1,10 @@
 import type { UserType } from '../enums/index.js';
 
 export type TUser = {
-  name: string;
+  firstname: string;
+  lastname: string;
   email: string;
-  avatar: string | undefined;//url
-  password: string;
+  avatarPath?: string;//url
+  password?: string;
   type: UserType;
 };

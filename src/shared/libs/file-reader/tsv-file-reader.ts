@@ -9,7 +9,8 @@ const CHUNK_SIZE = 16384;
 
 const getCoordsFromStr = (str: string): TCoords => {
   const [latit, longit] = str.split(';');
-
+  console.log('getCoordsFromStr');
+  console.log(str);
   return {
     latitude: Number(latit),
     longitude: Number(longit)
@@ -22,6 +23,7 @@ export class TSVFileReader extends EventEmitter implements IFileReader {
   }
 
   private parseLineToOffer(line: string): TOffer {
+
     const [
       title,
       description,
@@ -37,14 +39,16 @@ export class TSVFileReader extends EventEmitter implements IFileReader {
       guestQuantity,
       rentCost,
       comfort,
-      userName,
+      firstname,
+      lastname,
       userEmail,
       userAvatar,
       userPassword,
       userType,
       latlon
     ] = line.split('\t');
-
+    console.log('я line');
+    console.log(line.split('\t'));
     return {
       title,
       description,
@@ -61,17 +65,20 @@ export class TSVFileReader extends EventEmitter implements IFileReader {
       rentCost: Number(rentCost),
       comfort: comfort.split(';') as Comfort[],
       user: {
-        name: userName,
+        firstname: firstname,
+        lastname: lastname,
         email: userEmail,
-        avatar: userAvatar === 'null' ? undefined : userAvatar,
+        avatarPath: userAvatar === 'null' ? undefined : userAvatar,
         password: userPassword,
-        type: userType as UserType
+        type: userType as UserType,
       },
       coords: getCoordsFromStr(this.cutCRValue(latlon))
     };
   }
 
   cutCRValue(str: string) {
+    console.log('я сработала');
+    console.log(str);
     return str.replace('\r', '');
   }
 
@@ -94,7 +101,10 @@ export class TSVFileReader extends EventEmitter implements IFileReader {
         importedRowCount++;
 
         const parsedOffer = this.parseLineToOffer(completeRow);
-        this.emit('line', parsedOffer);
+
+        await new Promise((resolve) => {
+          this.emit('line', parsedOffer,resolve);
+        });
       }
     }
 
